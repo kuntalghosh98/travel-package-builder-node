@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import '../src/config/loadEnv.js';
 import fs from 'fs/promises';
 import mongoose from 'mongoose';
 import { config } from '../src/config/index.js';

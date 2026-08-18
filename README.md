@@ -2,50 +2,57 @@
 
 Node.js REST API for the Travel Package Builder frontend. Data is stored in MongoDB.
 
-## Project structure
-
-```
-travel-package-builder-node/
-├── data/
-│   └── db.json                 # Seed data (imported into MongoDB)
-├── scripts/
-│   └── seed.js                 # Import db.json into MongoDB
-├── src/
-│   ├── index.js                # Server entry point
-│   ├── app.js                  # Express app setup
-│   ├── config/
-│   │   ├── index.js            # Port, MongoDB URI, collection names
-│   │   └── db.js               # MongoDB connection
-│   ├── models/                 # Mongoose models
-│   ├── repositories/
-│   │   └── mongoRepository.js  # MongoDB CRUD
-│   ├── controllers/
-│   ├── middleware/
-│   ├── routes/
-│   ├── services/
-│   └── utils/
-├── .env                        # Local env (not committed)
-├── .env.example
-└── package.json
-```
-
 ## Setup
 
 ```bash
 cd travel-package-builder-node
 npm install
 cp .env.example .env
-# Edit .env with your MongoDB URI
+# Add your MONGODB_URI to .env
 npm run seed
 ```
 
 ## Run
 
 ```bash
+# Local development
 npm run dev
+
+# Production
+npm run start
 ```
 
-API: `http://localhost:3001`
+## Environment
+
+Env files load in this order (later overrides earlier):
+
+1. `.env.[NODE_ENV].local` (gitignored secrets)
+2. `.env.[NODE_ENV]` (committed defaults)
+3. `.env.local` (gitignored)
+4. `.env` (gitignored — your local secrets)
+
+| File | When used |
+|------|-----------|
+| `.env.development` | `npm run dev` — local URLs |
+| `.env.production` | `npm run start` — live URLs |
+| `.env` | Your MongoDB URI and overrides |
+
+| Variable | Dev example | Prod example |
+|----------|-------------|--------------|
+| `NODE_ENV` | `development` | `production` |
+| `PORT` | `3001` | `3001` |
+| `BASE_URL` | `http://localhost:3001` | `https://api.yourdomain.com` |
+| `FRONTEND_URL` | `http://localhost:5173` | `https://your-frontend.vercel.app` |
+| `CLIENT_ORIGIN` | `http://localhost:5173` | `https://your-frontend.vercel.app` |
+| `MONGODB_URI` | dev database | prod database |
+
+### Going live
+
+1. Set live values in `.env.production` or your host’s env panel
+2. Set frontend `VITE_API_URL` to `BASE_URL + /api`
+   - Backend: `BASE_URL=https://api.yourdomain.com`
+   - Frontend: `VITE_API_URL=https://api.yourdomain.com/api`
+3. Set `CLIENT_ORIGIN` to your deployed frontend URL for CORS
 
 ## Endpoints
 
@@ -59,23 +66,15 @@ API: `http://localhost:3001`
 | GET/POST | `/api/packages` |
 | GET/PUT/DELETE | `/api/packages/:id` |
 
-## Environment
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `3001` | Server port |
-| `MONGODB_URI` | — | MongoDB connection string (required) |
-| `SEED_PATH` | `data/db.json` | Path to seed JSON file |
-
 ## Frontend
 
 ```bash
 # Terminal 1 - backend
 npm run dev
 
-# Terminal 2 - frontend (from travel-package-builder)
+# Terminal 2 - frontend
 npm run api
 npm run dev
 ```
 
-Vite proxies `/api` → `http://localhost:3001`.
+Vite proxies `/api` → `http://localhost:3001` in development.
